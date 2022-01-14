@@ -12,6 +12,9 @@ module bmif_2_0
   integer, parameter :: BMI_MAX_VAR_NAME = 2048
   integer, parameter :: BMI_MAX_TYPE_NAME = 2048
   integer, parameter :: BMI_MAX_UNITS_NAME = 2048
+  integer, parameter :: BMI_MAX_ROLE_NAME = 2048
+  integer, parameter :: BMI_MAX_LOCATION_NAME = 2048
+  integer, parameter :: BMI_MAX_FILE_NAME = 2048
 
   integer, parameter :: BMI_FAILURE = 1
   integer, parameter :: BMI_SUCCESS = 0
@@ -96,6 +99,17 @@ module bmif_2_0
       procedure(bmif_get_grid_face_nodes), deferred :: get_grid_face_nodes
       procedure(bmif_get_grid_nodes_per_face), deferred :: &
            get_grid_nodes_per_face
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+      ! New BMI functions to support variable roles
+      ! for serialization, calibration, etc.
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+      procedure(bmif_get_bmi_version), deferred :: get_bmi_version
+      procedure(bmif_get_var_count), deferred :: get_var_count
+      procedure(bmif_get_var_names), deferred :: get_var_names
+      !------------------------------------------------------------
+      procedure(bmif_get_var_index), deferred :: get_var_index
+      procedure(bmif_get_var_role), deferred :: get_var_role
+      procedure(bmif_get_var_length), deferred :: get_var_length
   end type bmi
 
   abstract interface
@@ -559,6 +573,56 @@ module bmif_2_0
       integer :: bmi_status
     end function bmif_get_grid_nodes_per_face
 
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+      ! New BMI functions to support variable roles
+      ! for serialization, calibration, etc.
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+    function bmif_get_bmi_version(this, version) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(out) :: version
+      integer :: bmi_status
+    end function bmif_get_bmi_version
+    ! Count a model's variables.
+    function bmif_get_var_count(this, role, count) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: role
+      integer, intent(out) :: count
+      integer :: bmi_status
+    end function bmif_get_var_count
+    ! List a model's variables.
+    function bmif_get_var_names(this, role, names) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: role
+      character(len=*), pointer, intent(out) :: names(:)
+      integer :: bmi_status
+    end function bmif_get_var_names
+
+    function bmif_get_var_index(this, name, index) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer, intent(out) :: index
+      integer :: bmi_status
+    end function bmif_get_var_index
+
+    function bmif_get_var_role(this, name, role) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      character(len=*), intent(out) :: role
+      integer :: bmi_status
+    end function bmif_get_var_role
+
+    function bmif_get_var_length(this, name, size) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer, intent(out) :: size
+      integer :: bmi_status
+    end function bmif_get_var_length
   end interface
 
 end module bmif_2_0
