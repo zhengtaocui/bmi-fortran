@@ -54,6 +54,7 @@ module bmif_2_0
       procedure(bmif_get_value_int), deferred :: get_value_int
       procedure(bmif_get_value_float), deferred :: get_value_float
       procedure(bmif_get_value_double), deferred :: get_value_double
+      procedure(bmif_get_value_string), deferred :: get_value_string
       procedure(bmif_get_value_ptr_int), deferred :: get_value_ptr_int
       procedure(bmif_get_value_ptr_float), deferred :: get_value_ptr_float
       procedure(bmif_get_value_ptr_double), deferred :: get_value_ptr_double
@@ -68,6 +69,7 @@ module bmif_2_0
       procedure(bmif_set_value_int), deferred :: set_value_int
       procedure(bmif_set_value_float), deferred :: set_value_float
       procedure(bmif_set_value_double), deferred :: set_value_double
+      procedure(bmif_set_value_string), deferred :: set_value_string
       procedure(bmif_set_value_at_indices_int), deferred :: &
            set_value_at_indices_int
       procedure(bmif_set_value_at_indices_float), deferred :: &
@@ -305,6 +307,14 @@ module bmif_2_0
       integer :: bmi_status
     end function bmif_get_value_double
 
+    function bmif_get_value_string(this, name, dest) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      character(len=*), intent(inout) :: dest
+      integer :: bmi_status
+    end function bmif_get_value_string
+
     ! Get a reference to the given integer variable.
     function bmif_get_value_ptr_int(this, name, dest_ptr) result(bmi_status)
       import :: bmi
@@ -391,6 +401,14 @@ module bmif_2_0
       double precision, intent(in) :: src(:)
       integer :: bmi_status
     end function bmif_set_value_double
+
+    function bmif_set_value_string(this, name, src) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout) :: this
+      character(len=*), intent(in) :: name
+      character(len=*), intent(in) :: src
+      integer :: bmi_status
+    end function bmif_set_value_string
 
     ! Set integer values at particular (one-dimensional) indices.
     function bmif_set_value_at_indices_int(this, name, inds, src) &

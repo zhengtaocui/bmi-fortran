@@ -9,6 +9,11 @@ set(iso_c_bmi iso_c)
 set(mod_name ${CMAKE_PROJECT_NAME}_${bmi_major_version}_${bmi_minor_version})
 set(iso_mod_name ${iso_c_bmi}_${CMAKE_PROJECT_NAME}_${bmi_major_version}_${bmi_minor_version})
 
+set(bmi_public_headers
+	${CMAKE_BINARY_DIR}/${mod_name}.mod
+	${CMAKE_BINARY_DIR}/${iso_mod_name}.mod
+)
+
 # Create static and shared libraries.
 add_library(${CMAKE_PROJECT_NAME}_static bmi.f90 iso_c_bmi.f90)
 add_library(${CMAKE_PROJECT_NAME}_shared SHARED bmi.f90 iso_c_bmi.f90)
@@ -30,8 +35,8 @@ set_target_properties(${CMAKE_PROJECT_NAME}_static PROPERTIES
 )
 set_target_properties(${CMAKE_PROJECT_NAME}_shared PROPERTIES
   VERSION ${bmi_major_version}.${bmi_minor_version}
-  PUBLIC_HEADER ${CMAKE_BINARY_DIR}/${mod_name}.mod
-  PUBLIC_HEADER ${CMAKE_BINARY_DIR}/${iso_mod_name}.mod
+  PUBLIC_HEADER "${bmi_public_headers}"
+  #  PUBLIC_HEADER ${CMAKE_BINARY_DIR}/${iso_mod_name}.mod
 )
 
 install(
