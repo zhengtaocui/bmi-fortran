@@ -52,9 +52,13 @@ module bmif_2_0
 
       ! Getters, by type
       procedure(bmif_get_value_int), deferred :: get_value_int
+      procedure(bmif_get_value_int1), deferred :: get_value_int1
+      procedure(bmif_get_value_int2), deferred :: get_value_int2
+      procedure(bmif_get_value_int8), deferred :: get_value_int8
       procedure(bmif_get_value_float), deferred :: get_value_float
       procedure(bmif_get_value_double), deferred :: get_value_double
       procedure(bmif_get_value_string), deferred :: get_value_string
+      procedure(bmif_get_value_logical), deferred :: get_value_logical
       procedure(bmif_get_value_ptr_int), deferred :: get_value_ptr_int
       procedure(bmif_get_value_ptr_float), deferred :: get_value_ptr_float
       procedure(bmif_get_value_ptr_double), deferred :: get_value_ptr_double
@@ -67,9 +71,13 @@ module bmif_2_0
 
       ! Setters, by type
       procedure(bmif_set_value_int), deferred :: set_value_int
+      procedure(bmif_set_value_int1), deferred :: set_value_int1
+      procedure(bmif_set_value_int2), deferred :: set_value_int2
+      procedure(bmif_set_value_int8), deferred :: set_value_int8
       procedure(bmif_set_value_float), deferred :: set_value_float
       procedure(bmif_set_value_double), deferred :: set_value_double
       procedure(bmif_set_value_string), deferred :: set_value_string
+      procedure(bmif_set_value_logical), deferred :: set_value_logical
       procedure(bmif_set_value_at_indices_int), deferred :: &
            set_value_at_indices_int
       procedure(bmif_set_value_at_indices_float), deferred :: &
@@ -289,6 +297,30 @@ module bmif_2_0
       integer :: bmi_status
     end function bmif_get_value_int
 
+    function bmif_get_value_int1(this, name, dest) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=1), intent(inout) :: dest(:)
+      integer :: bmi_status
+    end function bmif_get_value_int1
+
+    function bmif_get_value_int2(this, name, dest) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=2), intent(inout) :: dest(:)
+      integer :: bmi_status
+    end function bmif_get_value_int2
+
+    function bmif_get_value_int8(this, name, dest) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=8), intent(inout) :: dest(:)
+      integer :: bmi_status
+    end function bmif_get_value_int8
+
     ! Get a copy of values (flattened!) of the given real variable.
     function bmif_get_value_float(this, name, dest) result(bmi_status)
       import :: bmi
@@ -314,6 +346,14 @@ module bmif_2_0
       character(len=*), intent(inout) :: dest
       integer :: bmi_status
     end function bmif_get_value_string
+
+    function bmif_get_value_logical(this, name, dest) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      logical, intent(inout) :: dest(:)
+      integer :: bmi_status
+    end function bmif_get_value_logical
 
     ! Get a reference to the given integer variable.
     function bmif_get_value_ptr_int(this, name, dest_ptr) result(bmi_status)
@@ -384,6 +424,30 @@ module bmif_2_0
       integer :: bmi_status
     end function bmif_set_value_int
 
+    function bmif_set_value_int1(this, name, src) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=1), intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_int1
+
+    function bmif_set_value_int2(this, name, src) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=2), intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_int2
+
+    function bmif_set_value_int8(this, name, src) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=8), intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_int8
+
     ! Set new values for a real model variable.
     function bmif_set_value_float(this, name, src) result(bmi_status)
       import :: bmi
@@ -409,6 +473,14 @@ module bmif_2_0
       character(len=*), intent(in) :: src
       integer :: bmi_status
     end function bmif_set_value_string
+
+    function bmif_set_value_logical(this, name, src) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout) :: this
+      character(len=*), intent(in) :: name
+      logical, intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_logical
 
     ! Set integer values at particular (one-dimensional) indices.
     function bmif_set_value_at_indices_int(this, name, inds, src) &
