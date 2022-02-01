@@ -15,6 +15,7 @@ module bmif_2_0
   integer, parameter :: BMI_MAX_ROLE_NAME = 2048
   integer, parameter :: BMI_MAX_LOCATION_NAME = 2048
   integer, parameter :: BMI_MAX_FILE_NAME = 2048
+  integer, parameter :: BMI_MAX_STRING_LENGTH = 2048 
 
   integer, parameter :: BMI_FAILURE = 1
   integer, parameter :: BMI_SUCCESS = 0

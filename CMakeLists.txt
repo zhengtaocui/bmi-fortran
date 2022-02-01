@@ -12,6 +12,7 @@ set(iso_mod_name ${iso_c_bmi}_${CMAKE_PROJECT_NAME}_${bmi_major_version}_${bmi_m
 set(bmi_public_headers
 	${CMAKE_BINARY_DIR}/${mod_name}.mod
 	${CMAKE_BINARY_DIR}/${iso_mod_name}.mod
+	${CMAKE_SOURCE_DIR}/${iso_mod_name}.h
 )
 
 # Create static and shared libraries.
