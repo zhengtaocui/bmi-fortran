@@ -11,7 +11,9 @@
 
 module iso_c_bmif_2_0
   use bmif_2_0
-  use, intrinsic :: iso_c_binding, only: c_ptr, c_loc, c_f_pointer, c_char, c_null_char, c_int, c_double, c_float, c_short, c_long
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_loc, c_f_pointer, &
+          c_char, c_null_char, c_int, c_double, c_float, c_short, &
+          c_long, c_bool
   implicit none
 
   type box
@@ -386,19 +388,189 @@ module iso_c_bmif_2_0
     function get_value_logical(this, name, dest) result(bmi_status) bind(C, name="get_value_logical")
       type(c_ptr) :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
-      logical(kind=4) :: dest(*)
+      logical(kind=c_bool) :: dest(*)
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
       !for determining the number of items to get
       integer :: item_size, num_bytes, num_items, grid
       character(kind=c_char, len=:), allocatable :: f_str
+      logical, dimension(:), allocatable :: log4byte
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
 
       f_str = c_to_f_string(name)
       bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
-      bmi_status = bmi_box%ptr%get_value_logical(f_str, dest(:num_items))
+      allocate( logical::log4byte( num_items ) )
+      bmi_status = bmi_box%ptr%get_value_logical(f_str, log4byte)
+      dest(:num_items) = log4byte
       deallocate(f_str)
+      deallocate( log4byte )
     end function get_value_logical
+
+    ! Set new values for an integer model variable.
+    function set_value_int(this, name, src) result(bmi_status) bind(C, name="set_value_int")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      integer(kind=c_int) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_int(f_str, src(:num_items))
+      deallocate(f_str)
+    end function set_value_int
+
+    function set_value_int1(this, name, src) result(bmi_status) bind(C, name="set_value_int1")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      integer(kind=1) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_int1(f_str, src(:num_items))
+      deallocate(f_str)
+    end function set_value_int1
+
+    function set_value_int2(this, name, src) result(bmi_status) bind(C, name="set_value_int2")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      integer(kind=c_short) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_int2(f_str, src(:num_items))
+      deallocate(f_str)
+    end function set_value_int2
+
+    function set_value_int8(this, name, src) result(bmi_status) bind(C, name="set_value_int8")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      integer(kind=c_long) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_int8(f_str, src(:num_items))
+      deallocate(f_str)
+    end function set_value_int8
+
+    ! Set new values for a real model variable.
+    function set_value_float(this, name, src) result(bmi_status) bind(C, name="set_value_float")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      real(kind=c_float) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !FIXME try both paths, nbytes/itemsize and grid info in cause some model doesn't implement
+      !one one or the other????
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_float(f_str, src(:num_items))
+      deallocate(f_str)
+    end function set_value_float
+
+    ! Set new values for a double model variable.
+    function set_value_double(this, name, src) result(bmi_status) bind(C, name="set_value_double")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      real(kind=c_double) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_double(f_str, src(:num_items))
+      deallocate(f_str)
+    end function set_value_double
+
+    function set_value_logical(this, name, src) result(bmi_status) bind(C, name="set_value_logical")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      logical(kind=c_bool) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      logical, dimension(:), allocatable :: log4byte
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      allocate( logical::log4byte( num_items ) )
+      log4byte = src(:num_items)
+      write(*,*) 'bmi_iso_c:', src(:num_items)
+      bmi_status = bmi_box%ptr%set_value_logical(f_str, log4byte)
+      deallocate(f_str)
+      deallocate(log4byte)
+    end function set_value_logical
+
+    function set_value_string(this, name, src) result(bmi_status) bind(C, name="set_value_string")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      character(kind=c_char, len=1), dimension(BMI_MAX_STRING_LENGTH), intent(in) :: src
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      character(kind=c_char, len=:), allocatable :: f_src
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+  
+      f_str = c_to_f_string(name)
+      f_src = c_to_f_string(src)
+      bmi_status = bmi_box%ptr%get_var_length(f_str, num_items)
+      bmi_status = bmi_box%ptr%set_value_string(f_str, f_src)
+      deallocate(f_str)
+      deallocate(f_src)
+    end function set_value_string
+
 end module iso_c_bmif_2_0

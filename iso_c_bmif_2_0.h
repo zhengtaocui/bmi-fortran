@@ -30,4 +30,12 @@ extern int get_value_double(void **, char*,  double* );
 extern int get_value_string(void **, char*,  char* );
 extern int get_value_logical(void **, char*,  int* );
 
+extern int set_value_int(void **, char*,  int* );
+extern int set_value_int1(void **, char*,  char* );
+extern int set_value_int2(void **, char*,  short* );
+extern int set_value_int8(void **, char*,  long* );
+extern int set_value_float(void **, char*,  float* );
+extern int set_value_double(void **, char*,  double* );
+extern int set_value_string(void **, char*,  char* );
+extern int set_value_logical(void **, char*,  int* );
 #endif // #ifndef ISO_C_BMIF_H
