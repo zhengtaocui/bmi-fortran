@@ -8,6 +8,14 @@
 ! that allow a Fortran BMI compatible model to interoperate with a C program, given that the
 ! BMI module implelements a `register` function that is able to return an appropriate opaque handle
 ! to the C caller.
+!
+! Last modified by Zhengtao Cui (Zhengtao.Cui@noaa.gov)
+! Last modification date: Feb 10, 2022
+! Description: modified the original code for the dummy sine model to
+!             various approaches and strategies to serialize Fortran
+!             models.
+!             Added function for testing get_var_ptr_* functions, i.e,
+!             pass value to C by pointers.
 
 module iso_c_bmif_2_0
   use bmif_2_0
@@ -221,7 +229,7 @@ module iso_c_bmif_2_0
       f_role = c_to_f_string(role)
 
       bmi_status = bmi_box%ptr%get_var_names(f_role, f_names)
-      names = c_loc(f_names)
+      names = c_loc(f_names(1))
 !      do i = 1, size(f_names)
 !        !For each pointer (one for each name), associate c_buff_ptr with the string names points to
 !        call c_f_pointer(names(i), c_buff_ptr, [ BMI_MAX_VAR_NAME ] )
@@ -408,6 +416,66 @@ module iso_c_bmif_2_0
       deallocate( log4byte )
     end function get_value_logical
 
+    function get_value_ptr_double_1darray(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double_1darray")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      double precision, pointer :: dest_ptr(:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to get
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_double_1darray(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1) )
+      deallocate(f_str)
+    end function get_value_ptr_double_1darray
+
+    function get_value_ptr_double_2darray(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double_2darray")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      double precision, pointer :: dest_ptr(:,:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to get
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_double_2darray(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1,1) )
+      deallocate(f_str)
+    end function get_value_ptr_double_2darray
+
+    function get_value_ptr_double_scalar(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double_scalar")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      double precision, pointer :: dest_ptr
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      !for determining the number of items to get
+      integer :: item_size, num_bytes, num_items, grid
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_double_scalar(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr )
+      deallocate(f_str)
+    end function get_value_ptr_double_scalar
+
     ! Set new values for an integer model variable.
     function set_value_int(this, name, src) result(bmi_status) bind(C, name="set_value_int")
       type(c_ptr) :: this
@@ -572,5 +640,21 @@ module iso_c_bmif_2_0
       deallocate(f_str)
       deallocate(f_src)
     end function set_value_string
+
+    function get_var_grid(this, name, grid) result(bmi_status) bind(C, name="get_var_grid")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      integer(kind=c_int), intent(out) :: grid
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_name
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      f_name = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_var_grid(f_name, grid)
+      deallocate(f_name)
+    end function get_var_grid
 
 end module iso_c_bmif_2_0

@@ -30,6 +30,11 @@ extern int get_value_float(void **, char*,  float* );
 extern int get_value_double(void **, char*,  double* );
 extern int get_value_string(void **, char*,  char* );
 extern int get_value_logical(void **, char*,  bool* );
+extern int get_var_grid(void **, char*,  int* );
+
+extern int get_value_ptr_double_scalar(void **, char*,  double** );
+extern int get_value_ptr_double_1darray(void **, char*,  double** );
+extern int get_value_ptr_double_2darray(void **, char*,  double** );
 
 extern int set_value_int(void **, char*,  int* );
 extern int set_value_int1(void **, char*,  char* );
