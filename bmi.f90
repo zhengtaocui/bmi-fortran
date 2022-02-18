@@ -6,8 +6,9 @@
 !
 !
 ! Last modified by Zhengtao Cui 
-! Last modification date: Feb 10, 2022
+! Last modification date: Feb 18, 2022
 ! Description: Add functions for getting double precision pointer types.
+!              Add the real*4 get value ptr function
 !
 module bmif_2_0
 
@@ -67,15 +68,16 @@ module bmif_2_0
       procedure(bmif_get_value_logical), deferred :: get_value_logical
       procedure(bmif_get_value_ptr_int), deferred :: get_value_ptr_int
       procedure(bmif_get_value_ptr_float), deferred :: get_value_ptr_float
+      procedure(bmif_get_value_ptr_double), deferred :: get_value_ptr_double
       !
       !this *_scalar, *_1darray and _*_2darray functions are necessary
       !because the pointer has types. A pointer of a scalar is not the
       !same type of a pointer of an array. 
       !A better way might be to use some generic proedures.
       !
-      procedure(bmif_get_value_ptr_double_scalar), deferred :: get_value_ptr_double_scalar
-      procedure(bmif_get_value_ptr_double_1darray), deferred :: get_value_ptr_double_1darray
-      procedure(bmif_get_value_ptr_double_2darray), deferred :: get_value_ptr_double_2darray
+      !procedure(bmif_get_value_ptr_double_scalar), deferred :: get_value_ptr_double_scalar
+      !procedure(bmif_get_value_ptr_double_1darray), deferred :: get_value_ptr_double_1darray
+      !procedure(bmif_get_value_ptr_double_2darray), deferred :: get_value_ptr_double_2darray
       procedure(bmif_get_value_at_indices_int), deferred :: &
            get_value_at_indices_int
       procedure(bmif_get_value_at_indices_float), deferred :: &
@@ -381,36 +383,48 @@ module bmif_2_0
     ! Get a reference to the given real variable.
     function bmif_get_value_ptr_float(this, name, dest_ptr) result(bmi_status)
       import :: bmi
-      class(bmi), intent(in) :: this
+      ! set the bmi object target attribut so that pointers can be used
+      ! to point to components of the bmi object
+      class(bmi), intent(in), target :: this
       character(len=*), intent(in) :: name
       real, pointer, intent(inout) :: dest_ptr(:)
       integer :: bmi_status
     end function bmif_get_value_ptr_float
 
     ! Get a reference to the given double variable.
-    function bmif_get_value_ptr_double_1darray(this, name, dest_ptr) result(bmi_status)
+    function bmif_get_value_ptr_double(this, name, dest_ptr) result(bmi_status)
       import :: bmi
-      class(bmi), intent(in) :: this
+      ! set the bmi object target attribut so that pointers can be used
+      ! to point to components of the bmi object
+      class(bmi), intent(in), target :: this
       character(len=*), intent(in) :: name
       double precision, pointer, intent(inout) :: dest_ptr(:)
       integer :: bmi_status
-    end function bmif_get_value_ptr_double_1darray
+    end function bmif_get_value_ptr_double
 
-    function bmif_get_value_ptr_double_2darray(this, name, dest_ptr) result(bmi_status)
-      import :: bmi
-      class(bmi), intent(in) :: this
-      character(len=*), intent(in) :: name
-      double precision, pointer, intent(inout) :: dest_ptr(:,:)
-      integer :: bmi_status
-    end function bmif_get_value_ptr_double_2darray
-
-    function bmif_get_value_ptr_double_scalar(this, name, dest_ptr) result(bmi_status)
-      import :: bmi
-      class(bmi), intent(in) :: this
-      character(len=*), intent(in) :: name
-      double precision, pointer, intent(inout) :: dest_ptr
-      integer :: bmi_status
-    end function bmif_get_value_ptr_double_scalar
+!    function bmif_get_value_ptr_double_1darray(this, name, dest_ptr) result(bmi_status)
+!      import :: bmi
+!      class(bmi), intent(in), target :: this
+!      character(len=*), intent(in) :: name
+!      double precision, pointer, intent(inout) :: dest_ptr(:)
+!      integer :: bmi_status
+!    end function bmif_get_value_ptr_double_1darray
+!
+!    function bmif_get_value_ptr_double_2darray(this, name, dest_ptr) result(bmi_status)
+!      import :: bmi
+!      class(bmi), intent(in) :: this
+!      character(len=*), intent(in) :: name
+!      double precision, pointer, intent(inout) :: dest_ptr(:,:)
+!      integer :: bmi_status
+!    end function bmif_get_value_ptr_double_2darray
+!
+!    function bmif_get_value_ptr_double_scalar(this, name, dest_ptr) result(bmi_status)
+!      import :: bmi
+!      class(bmi), intent(in) :: this
+!      character(len=*), intent(in) :: name
+!      double precision, pointer, intent(inout) :: dest_ptr
+!      integer :: bmi_status
+!    end function bmif_get_value_ptr_double_scalar
 
     ! Get integer values at particular (one-dimensional) indices.
     function bmif_get_value_at_indices_int(this, name, dest, inds) &
