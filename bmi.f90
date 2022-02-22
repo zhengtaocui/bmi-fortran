@@ -383,8 +383,12 @@ module bmif_2_0
     ! Get a reference to the given real variable.
     function bmif_get_value_ptr_float(this, name, dest_ptr) result(bmi_status)
       import :: bmi
-      ! set the bmi object target attribut so that pointers can be used
-      ! to point to components of the bmi object
+      !
+      ! Here the `target` attribute for `this` is necessary, so that pointers 
+      ! can be used to point to components of the bmi object, not only pointer
+      !  type, but also other types such as scalar, alloctable array, and 
+      ! fixed size static array.
+      ! 
       class(bmi), intent(in), target :: this
       character(len=*), intent(in) :: name
       real, pointer, intent(inout) :: dest_ptr(:)
@@ -394,8 +398,12 @@ module bmif_2_0
     ! Get a reference to the given double variable.
     function bmif_get_value_ptr_double(this, name, dest_ptr) result(bmi_status)
       import :: bmi
-      ! set the bmi object target attribut so that pointers can be used
-      ! to point to components of the bmi object
+      !
+      ! Here the `target` attribute for `this` is necessary, so that pointers 
+      ! can be used to point to components of the bmi object, not only pointer
+      !  type, but also other types such as scalar, alloctable array, and 
+      ! fixed size static array.
+      ! 
       class(bmi), intent(in), target :: this
       character(len=*), intent(in) :: name
       double precision, pointer, intent(inout) :: dest_ptr(:)
