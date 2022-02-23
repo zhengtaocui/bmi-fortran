@@ -16,7 +16,16 @@
 !             models.
 !             Added function for testing get_var_ptr_* functions, i.e,
 !             pass value to C by pointers.
-
+!
+! Last modified by Zhengtao Cui (Zhengtao.Cui@noaa.gov)
+! Last modification date: Feb 23, 2022
+!
+! Description: Changed the iso c binding function to use pass-by-copy 
+!              for the `this` argument in the functions. This is needed 
+!              becasue we will combine the Fortran serialization  code
+!              with C serialization code, which uses pass-by-copy for
+!              C serialization functions.
+!
 module iso_c_bmif_2_0
   use bmif_2_0
   use, intrinsic :: iso_c_binding, only: c_ptr, c_loc, c_f_pointer, &
@@ -66,7 +75,9 @@ module iso_c_bmif_2_0
 
     ! Perform startup tasks for the model.
     function initialize(this, config_file) result(bmi_status) bind(C, name="initialize")
-      type(c_ptr) :: this
+      ! we use pass-by-value here to be consistant with C bmi serialization
+      ! code.
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_FILE_NAME), intent(in) :: config_file
       integer(kind=c_int) :: bmi_status
       character(len=:), allocatable :: f_file 
@@ -86,7 +97,7 @@ module iso_c_bmif_2_0
 
     ! Advance the model one time step.
     function update(this) result(bmi_status) bind(C, name="update")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
@@ -98,7 +109,7 @@ module iso_c_bmif_2_0
 
     ! Advance the model until the given time.
     function update_until(this, time) result(bmi_status) bind(C, name="update_until")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       real(kind=c_double), intent(in) :: time
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
@@ -111,7 +122,7 @@ module iso_c_bmif_2_0
 
     ! Perform teardown tasks for the model.
     function finalize(this) result(bmi_status) bind(C, name="finalize")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
@@ -126,7 +137,7 @@ module iso_c_bmif_2_0
 
     ! Get the name of the model.
     function get_component_name(handle, name) result(bmi_status) bind(C, name="get_component_name")
-      type(c_ptr) :: handle
+      type(c_ptr), value :: handle
       character(kind=c_char, len=1), dimension(*), intent(out) :: name
       character(len=BMI_MAX_COMPONENT_NAME), pointer :: f_name
       integer(kind=c_int) :: bmi_status
@@ -141,7 +152,7 @@ module iso_c_bmif_2_0
     end function get_component_name
 
     function get_current_time(this, time) result(bmi_status) bind(C, name="get_current_time")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       real(kind=c_double), intent(out) :: time
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
@@ -154,7 +165,7 @@ module iso_c_bmif_2_0
 
     ! Start time of the model.
     function get_start_time(this, time) result(bmi_status) bind(C, name="get_start_time")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       real(kind=c_double), intent(out) :: time
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
@@ -167,7 +178,7 @@ module iso_c_bmif_2_0
 
     ! End time of the model.
     function get_end_time(this, time) result(bmi_status) bind(C, name="get_end_time")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       real(kind=c_double), intent(out) :: time
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
@@ -179,7 +190,7 @@ module iso_c_bmif_2_0
     end function get_end_time
 
     function get_var_count(this, role, count) result(bmi_status) bind(C, name="get_var_count")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_ROLE_NAME), intent(in) :: role
       integer(kind=c_int) :: bmi_status
       integer(kind=c_int), intent(out) :: count
@@ -194,7 +205,7 @@ module iso_c_bmif_2_0
 
     ! Get the data type of the given variable as a string.
     function get_var_type(this, name, type) result(bmi_status) bind(C, name="get_var_type")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       character(kind=c_char, len=1), intent(out) :: type (*)
       character(kind=c_char, len=BMI_MAX_TYPE_NAME) :: f_type
@@ -212,7 +223,7 @@ module iso_c_bmif_2_0
     end function get_var_type
 
     function get_var_names(this, role, names) result(bmi_status) bind(C, name="get_var_names")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_ROLE_NAME), intent(in) :: role
 !      type(c_ptr), intent(inout)  :: names (*)
       type(c_ptr), intent(inout)  :: names
@@ -239,7 +250,7 @@ module iso_c_bmif_2_0
     end function get_var_names
 
     function get_var_length(this, name, size) result(bmi_status) bind(C, name="get_var_length")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_int), intent(out) :: size
       integer(kind=c_int) :: bmi_status
@@ -256,7 +267,7 @@ module iso_c_bmif_2_0
 
     ! Get a copy of values (flattened!) of the given integer variable.
     function get_value_int(this, name, dest) result(bmi_status) bind(C, name="get_value_int")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_int) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -275,7 +286,7 @@ module iso_c_bmif_2_0
     end function get_value_int
 
     function get_value_int1(this, name, dest) result(bmi_status) bind(C, name="get_value_int1")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=1) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -294,7 +305,7 @@ module iso_c_bmif_2_0
     end function get_value_int1
 
     function get_value_int2(this, name, dest) result(bmi_status) bind(C, name="get_value_int2")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_short) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -313,7 +324,7 @@ module iso_c_bmif_2_0
     end function get_value_int2
 
     function get_value_int8(this, name, dest) result(bmi_status) bind(C, name="get_value_int8")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_long) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -332,7 +343,7 @@ module iso_c_bmif_2_0
     end function get_value_int8
 
     function get_value_float(this, name, dest) result(bmi_status) bind(C, name="get_value_float")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       real(kind=c_float) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -351,7 +362,7 @@ module iso_c_bmif_2_0
     end function get_value_float
 
     function get_value_double(this, name, dest) result(bmi_status) bind(C, name="get_value_double")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       real(kind=c_double) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -370,7 +381,7 @@ module iso_c_bmif_2_0
     end function get_value_double
 
     function get_value_string(this, name, dest) result(bmi_status) bind(C, name="get_value_string")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       character(kind=c_char, len=1), dimension(BMI_MAX_STRING_LENGTH), intent(inout) :: dest
       integer(kind=c_int) :: bmi_status
@@ -394,7 +405,7 @@ module iso_c_bmif_2_0
     end function get_value_string
 
     function get_value_logical(this, name, dest) result(bmi_status) bind(C, name="get_value_logical")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       logical(kind=c_bool) :: dest(*)
       integer(kind=c_int) :: bmi_status
@@ -420,7 +431,7 @@ module iso_c_bmif_2_0
 
     ! get a C pointer to the variables of real*4 data type
     function get_value_ptr_float(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_float")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       type(c_ptr), intent(inout) :: dest_cptr
       integer(kind=c_int) :: bmi_status
@@ -439,7 +450,7 @@ module iso_c_bmif_2_0
 
     ! get a C pointer to the variables of double percision data type
     function get_value_ptr_double(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       type(c_ptr), intent(inout) :: dest_cptr
       integer(kind=c_int) :: bmi_status
@@ -518,7 +529,7 @@ module iso_c_bmif_2_0
 
     ! Set new values for an integer model variable.
     function set_value_int(this, name, src) result(bmi_status) bind(C, name="set_value_int")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_int) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -537,7 +548,7 @@ module iso_c_bmif_2_0
     end function set_value_int
 
     function set_value_int1(this, name, src) result(bmi_status) bind(C, name="set_value_int1")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=1) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -556,7 +567,7 @@ module iso_c_bmif_2_0
     end function set_value_int1
 
     function set_value_int2(this, name, src) result(bmi_status) bind(C, name="set_value_int2")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_short) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -575,7 +586,7 @@ module iso_c_bmif_2_0
     end function set_value_int2
 
     function set_value_int8(this, name, src) result(bmi_status) bind(C, name="set_value_int8")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_long) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -595,7 +606,7 @@ module iso_c_bmif_2_0
 
     ! Set new values for a real model variable.
     function set_value_float(this, name, src) result(bmi_status) bind(C, name="set_value_float")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
       real(kind=c_float) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -616,7 +627,7 @@ module iso_c_bmif_2_0
 
     ! Set new values for a double model variable.
     function set_value_double(this, name, src) result(bmi_status) bind(C, name="set_value_double")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
       real(kind=c_double) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -636,7 +647,7 @@ module iso_c_bmif_2_0
     end function set_value_double
 
     function set_value_logical(this, name, src) result(bmi_status) bind(C, name="set_value_logical")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       logical(kind=c_bool) :: src(*)
       integer(kind=c_int) :: bmi_status
@@ -662,7 +673,7 @@ module iso_c_bmif_2_0
     end function set_value_logical
 
     function set_value_string(this, name, src) result(bmi_status) bind(C, name="set_value_string")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       character(kind=c_char, len=1), dimension(BMI_MAX_STRING_LENGTH), intent(in) :: src
       integer(kind=c_int) :: bmi_status
@@ -684,7 +695,7 @@ module iso_c_bmif_2_0
     end function set_value_string
 
     function get_var_grid(this, name, grid) result(bmi_status) bind(C, name="get_var_grid")
-      type(c_ptr) :: this
+      type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
       integer(kind=c_int), intent(out) :: grid
       integer(kind=c_int) :: bmi_status
