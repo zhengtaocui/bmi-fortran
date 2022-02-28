@@ -67,8 +67,13 @@ module bmif_2_0
       procedure(bmif_get_value_string), deferred :: get_value_string
       procedure(bmif_get_value_logical), deferred :: get_value_logical
       procedure(bmif_get_value_ptr_int), deferred :: get_value_ptr_int
+      procedure(bmif_get_value_ptr_int1), deferred :: get_value_ptr_int1
+      procedure(bmif_get_value_ptr_int2), deferred :: get_value_ptr_int2
+      procedure(bmif_get_value_ptr_int8), deferred :: get_value_ptr_int8
+      procedure(bmif_get_value_ptr_logical), deferred :: get_value_ptr_logical
       procedure(bmif_get_value_ptr_float), deferred :: get_value_ptr_float
       procedure(bmif_get_value_ptr_double), deferred :: get_value_ptr_double
+      procedure(bmif_get_value_ptr_string), deferred :: get_value_ptr_string
       !
       !this *_scalar, *_1darray and _*_2darray functions are necessary
       !because the pointer has types. A pointer of a scalar is not the
@@ -374,11 +379,43 @@ module bmif_2_0
     ! Get a reference to the given integer variable.
     function bmif_get_value_ptr_int(this, name, dest_ptr) result(bmi_status)
       import :: bmi
-      class(bmi), intent(in) :: this
+      class(bmi), intent(in), target :: this
       character(len=*), intent(in) :: name
       integer, pointer, intent(inout) :: dest_ptr(:)
       integer :: bmi_status
     end function bmif_get_value_ptr_int
+
+    function bmif_get_value_ptr_int1(this, name, dest_ptr) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in), target :: this
+      character(len=*), intent(in) :: name
+      integer(kind=1), pointer, intent(inout) :: dest_ptr(:)
+      integer :: bmi_status
+    end function bmif_get_value_ptr_int1
+
+    function bmif_get_value_ptr_int2(this, name, dest_ptr) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in), target :: this
+      character(len=*), intent(in) :: name
+      integer(kind=2), pointer, intent(inout) :: dest_ptr(:)
+      integer :: bmi_status
+    end function bmif_get_value_ptr_int2
+
+    function bmif_get_value_ptr_int8(this, name, dest_ptr) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in), target :: this
+      character(len=*), intent(in) :: name
+      integer(kind=8), pointer, intent(inout) :: dest_ptr(:)
+      integer :: bmi_status
+    end function bmif_get_value_ptr_int8
+
+    function bmif_get_value_ptr_logical(this, name, dest_ptr) result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in), target :: this
+      character(len=*), intent(in) :: name
+      logical, pointer, intent(inout) :: dest_ptr(:)
+      integer :: bmi_status
+    end function bmif_get_value_ptr_logical
 
     ! Get a reference to the given real variable.
     function bmif_get_value_ptr_float(this, name, dest_ptr) result(bmi_status)
@@ -433,6 +470,21 @@ module bmif_2_0
 !      double precision, pointer, intent(inout) :: dest_ptr
 !      integer :: bmi_status
 !    end function bmif_get_value_ptr_double_scalar
+
+    ! Get a reference to the given string variable.
+    function bmif_get_value_ptr_string(this, name, dest_ptr) result(bmi_status)
+      import :: bmi
+      !
+      ! Here the `target` attribute for `this` is necessary, so that pointers 
+      ! can be used to point to components of the bmi object, not only pointer
+      !  type, but also other types such as scalar, alloctable array, and 
+      ! fixed size static array.
+      ! 
+      class(bmi), intent(in), target :: this
+      character(len=*), intent(in) :: name
+      character(len=:), pointer, intent(inout) :: dest_ptr
+      integer :: bmi_status
+    end function bmif_get_value_ptr_string
 
     ! Get integer values at particular (one-dimensional) indices.
     function bmif_get_value_at_indices_int(this, name, dest, inds) &

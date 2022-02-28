@@ -240,6 +240,10 @@ module iso_c_bmif_2_0
       f_role = c_to_f_string(role)
 
       bmi_status = bmi_box%ptr%get_var_names(f_role, f_names)
+
+      do i = 1, size(f_names)
+         f_names(i) = trim(f_names(i))//c_null_char
+      end do
       names = c_loc(f_names(1))
 !      do i = 1, size(f_names)
 !        !For each pointer (one for each name), associate c_buff_ptr with the string names points to
@@ -429,6 +433,102 @@ module iso_c_bmif_2_0
       deallocate( log4byte )
     end function get_value_logical
 
+    ! get a C pointer to the variables of integer*4 data type
+    function get_value_ptr_int(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_int")
+      type(c_ptr), value :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      integer, pointer :: dest_ptr(:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_int(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1) )
+      deallocate(f_str)
+    end function get_value_ptr_int
+
+    ! get a C pointer to the variables of integer*1 data type
+    function get_value_ptr_int1(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_int1")
+      type(c_ptr), value :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      integer(kind=1), pointer :: dest_ptr(:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_int1(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1) )
+      deallocate(f_str)
+    end function get_value_ptr_int1
+
+    ! get a C pointer to the variables of integer*2 data type
+    function get_value_ptr_int2(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_int2")
+      type(c_ptr), value :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      integer(kind=2), pointer :: dest_ptr(:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_int2(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1) )
+      deallocate(f_str)
+    end function get_value_ptr_int2
+
+    ! get a C pointer to the variables of integer*8 data type
+    function get_value_ptr_int8(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_int8")
+      type(c_ptr), value :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      integer(kind=8), pointer :: dest_ptr(:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_int8(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1) )
+      deallocate(f_str)
+    end function get_value_ptr_int8
+
+    ! get a C pointer to the variables of logical data type
+    function get_value_ptr_logical(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_logical")
+      type(c_ptr), value :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      !logical(kind=c_bool) :: dest_ptr(:)
+      logical, dimension(:), pointer :: dest_ptr(:)
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_str
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_logical(f_str, dest_ptr )
+      dest_cptr = c_loc( dest_ptr(1) )
+      deallocate(f_str)
+    end function get_value_ptr_logical
+
     ! get a C pointer to the variables of real*4 data type
     function get_value_ptr_float(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_float")
       type(c_ptr), value :: this
@@ -526,6 +626,28 @@ module iso_c_bmif_2_0
 !      dest_cptr = c_loc( dest_ptr )
 !      deallocate(f_str)
 !    end function get_value_ptr_double_scalar
+
+    ! get a C pointer to the variables of string data type
+    function get_value_ptr_string(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_string")
+      type(c_ptr), value :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
+      type(c_ptr), intent(inout) :: dest_cptr
+      integer(kind=c_int) :: bmi_status
+      character(len=:), pointer :: dest_ptr
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      character(kind=c_char, len=:), allocatable :: f_str
+      integer :: varlength
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      f_str = c_to_f_string(name)
+      bmi_status = bmi_box%ptr%get_value_ptr_string(f_str, dest_ptr )
+      bmi_status = bmi_box%ptr%get_var_length(f_str, varlength )
+      dest_ptr(varlength:varlength) = c_null_char
+      dest_cptr = c_loc( dest_ptr )
+      deallocate(f_str)
+    end function get_value_ptr_string
 
     ! Set new values for an integer model variable.
     function set_value_int(this, name, src) result(bmi_status) bind(C, name="set_value_int")
