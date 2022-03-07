@@ -7,7 +7,7 @@
 # bmi-fortran
 
 The Fortran specification, created with Fortran 2003,
-for the CSDMS [Basic Model Interface](https://bmi.readthedocs.io).
+for the CSDMS [Basic Model Interface](https://bmi.readthedocs.io). ISO C Interoperable code is included. A C wrapper is also included for the C serialization code.
 
 
 ## Build/Install
@@ -17,6 +17,7 @@ Instructions are given below.
 
 **Prerequisites:**
 * A Fortran compiler
+* A C compiler
 * CMake
 
 Alternately,
@@ -47,8 +48,13 @@ The installation will look (on Linux) like:
 ```bash
 .
 |-- include
+|   |-- iso_c_bmif_2_0.mod
+|   |-- iso_c_bmif_2_0.h
+|   |-- bmi_fortran.h
+|   |-- bmi.h
 |   `-- bmif_2_0.mod
 `-- lib
+    |-- libbmif.a
     |-- libbmif.so -> libbmif.so.2.0
     `-- libbmif.so.2.0
 ```
