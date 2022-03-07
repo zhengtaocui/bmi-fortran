@@ -2,20 +2,39 @@
   * bmi_fortran.c
   * ----------------------------------------------
   * auther: Zhengtao Cui
-  * created on Feb. 24, 2022
-  * Last date of modification: Feb 24, 2022
+  * created on Mar. 4, 2022
+  * Last date of modification: Mar 7, 2022
   * Reference: https://github.com/NOAA-OWP/cfe.git
   *            test_serialize/serialize_state.c
   *
-  * Description: 
+  * Description: These are the wrapper functions and implements the C BMI 
+  *              struct to be used by the cfe serialization code.
+  *              
   */
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include "iso_c_bmif_2_0.h"
 #include "bmi_fortran.h"
 #include "bmi.h"
 
+char* trim(char* str) {
+   char * start = str;
+   char * end = start + strlen(str);
+
+   while (--end >= start) {   /* trim right */
+      if (!isspace(*end))
+         break;
+   }
+   *(++end) = '\0';
+
+   while (isspace(*start))    /* trim left */
+      start++;
+
+   if (start != str)          /* there is a string */
+      memmove(str, start, end - start + 1);
+}
 
 int Initialize(Bmi *self, const char* file )
 {
@@ -32,13 +51,17 @@ int Get_var_count (Bmi *self, const char *role, int *count)
 int Get_var_names (Bmi *self, const char *role, char **names)
 {
    int count;
-
-   int bmi_status = get_var_names( self->data, role, names );
+   char **fornames = (char**)NULL;
+   fornames = (char**)malloc( sizeof(char*)); 
+   int bmi_status = get_var_names( self->data, role, fornames );
    bmi_status = get_var_count( self->data, role, &count );
    for ( int i = 0; i < count; ++i )
    {
-      names[i] = &names[0][ i * BMI_MAX_VAR_NAME ];
+      //populate the array of C stings.
+      strncpy(names[i], fornames[0] + i * BMI_MAX_VAR_NAME, BMI_MAX_VAR_NAME ); 
+      names[i] = trim( names[i] );
    }
+   free(fornames);
    return bmi_status;   
 }
 
