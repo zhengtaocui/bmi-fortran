@@ -28,6 +28,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+/*
+ * Last modified by Zhengtao Cui (Zhengtao.Cui@noaa.gov)
+ * Description: add more BMI_MAX_*_NAME definations such that it
+ *              can work with the serialization code.
+ */
 #ifndef BMI_H
 #define BMI_H
 
@@ -40,6 +45,7 @@ extern "C" {
 
 #define BMI_MAX_UNITS_NAME (2048)
 #define BMI_MAX_TYPE_NAME (2048)
+#define BMI_MAX_ROLE_NAME (2048)
 #define BMI_MAX_COMPONENT_NAME (2048)
 #define BMI_MAX_VAR_NAME (2048)
 #define BMI_MAX_LOCATION_NAME (2048) //OWP Custom

@@ -26,6 +26,13 @@
 !              with C serialization code, which uses pass-by-copy for
 !              C serialization functions.
 !
+! Last modified by Zhengtao Cui (Zhengtao.Cui@noaa.gov)
+! Last modification date: Mar 10, 2022
+!
+! Description: Changed the get_var_names to return a copy of the names
+!              instead of a pointer. It is consistent with the version
+!              in ngen repository now.
+!
 module iso_c_bmif_2_0
   use bmif_2_0
   use, intrinsic :: iso_c_binding, only: c_ptr, c_loc, c_f_pointer, &
@@ -225,8 +232,8 @@ module iso_c_bmif_2_0
     function get_var_names(this, role, names) result(bmi_status) bind(C, name="get_var_names")
       type(c_ptr), value :: this
       character(kind=c_char, len=1), dimension(BMI_MAX_ROLE_NAME), intent(in) :: role
-!      type(c_ptr), intent(inout)  :: names (*)
-      type(c_ptr), intent(inout)  :: names
+      type(c_ptr), intent(inout)  :: names (*)
+!      type(c_ptr), intent(inout)  :: names
       character(kind=c_char, len=BMI_MAX_VAR_NAME), pointer :: f_names(:)
       character(kind=c_char, len=1), pointer :: c_buff_ptr(:)
       integer(kind=c_int) :: bmi_status
@@ -241,16 +248,20 @@ module iso_c_bmif_2_0
 
       bmi_status = bmi_box%ptr%get_var_names(f_role, f_names)
 
-      do i = 1, size(f_names)
-         f_names(i) = trim(f_names(i))//c_null_char
-      end do
-      names = c_loc(f_names(1))
+      !
+      !This will return a pointer instead of a copy
+      ! of the names.
+      !
 !      do i = 1, size(f_names)
-!        !For each pointer (one for each name), associate c_buff_ptr with the string names points to
-!        call c_f_pointer(names(i), c_buff_ptr, [ BMI_MAX_VAR_NAME ] )
-!        !assign the c_string to buffer
-!        c_buff_ptr = f_to_c_string(f_names(i))
+!         f_names(i) = trim(f_names(i))//c_null_char
 !      end do
+!      names = c_loc(f_names(1))
+      do i = 1, size(f_names)
+        !For each pointer (one for each name), associate c_buff_ptr with the string names points to
+        call c_f_pointer(names(i), c_buff_ptr, [ BMI_MAX_VAR_NAME ] )
+        !assign the c_string to buffer
+        c_buff_ptr = f_to_c_string(f_names(i))
+      end do
     end function get_var_names
 
     function get_var_length(this, name, size) result(bmi_status) bind(C, name="get_var_length")
@@ -566,66 +577,6 @@ module iso_c_bmif_2_0
       dest_cptr = c_loc( dest_ptr(1) )
       deallocate(f_str)
     end function get_value_ptr_double
-
-!    function get_value_ptr_double_1darray(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double_1darray")
-!      type(c_ptr) :: this
-!      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
-!      type(c_ptr), intent(inout) :: dest_cptr
-!      integer(kind=c_int) :: bmi_status
-!      double precision, pointer :: dest_ptr(:)
-!      !use a wrapper for c interop
-!      type(box), pointer :: bmi_box
-!      !for determining the number of items to get
-!      integer :: item_size, num_bytes, num_items, grid
-!      character(kind=c_char, len=:), allocatable :: f_str
-!      !extract the fortran type from handle
-!      call c_f_pointer(this, bmi_box)
-!
-!      f_str = c_to_f_string(name)
-!      bmi_status = bmi_box%ptr%get_value_ptr_double_1darray(f_str, dest_ptr )
-!      dest_cptr = c_loc( dest_ptr(1) )
-!      deallocate(f_str)
-!    end function get_value_ptr_double_1darray
-!
-!    function get_value_ptr_double_2darray(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double_2darray")
-!      type(c_ptr) :: this
-!      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
-!      type(c_ptr), intent(inout) :: dest_cptr
-!      integer(kind=c_int) :: bmi_status
-!      double precision, pointer :: dest_ptr(:,:)
-!      !use a wrapper for c interop
-!      type(box), pointer :: bmi_box
-!      !for determining the number of items to get
-!      integer :: item_size, num_bytes, num_items, grid
-!      character(kind=c_char, len=:), allocatable :: f_str
-!      !extract the fortran type from handle
-!      call c_f_pointer(this, bmi_box)
-!
-!      f_str = c_to_f_string(name)
-!      bmi_status = bmi_box%ptr%get_value_ptr_double_2darray(f_str, dest_ptr )
-!      dest_cptr = c_loc( dest_ptr(1,1) )
-!      deallocate(f_str)
-!    end function get_value_ptr_double_2darray
-!
-!    function get_value_ptr_double_scalar(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_double_scalar")
-!      type(c_ptr) :: this
-!      character(kind=c_char, len=1), dimension(BMI_MAX_VAR_NAME), intent(in) :: name
-!      type(c_ptr), intent(inout) :: dest_cptr
-!      integer(kind=c_int) :: bmi_status
-!      double precision, pointer :: dest_ptr
-!      !use a wrapper for c interop
-!      type(box), pointer :: bmi_box
-!      !for determining the number of items to get
-!      integer :: item_size, num_bytes, num_items, grid
-!      character(kind=c_char, len=:), allocatable :: f_str
-!      !extract the fortran type from handle
-!      call c_f_pointer(this, bmi_box)
-!
-!      f_str = c_to_f_string(name)
-!      bmi_status = bmi_box%ptr%get_value_ptr_double_scalar(f_str, dest_ptr )
-!      dest_cptr = c_loc( dest_ptr )
-!      deallocate(f_str)
-!    end function get_value_ptr_double_scalar
 
     ! get a C pointer to the variables of string data type
     function get_value_ptr_string(this, name, dest_cptr) result(bmi_status) bind(C, name="get_value_ptr_string")

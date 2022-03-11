@@ -1,3 +1,15 @@
+/** ----------------------------------------------
+  * bmi_fortran.h
+  * ----------------------------------------------
+  * auther: Zhengtao Cui
+  * created on Mar. 4, 2022
+  * Last date of modification: Mar 10, 2022
+  * Reference: https://github.com/NOAA-OWP/cfe.git
+  *            test_serialize/serialize_state.c
+  *
+  * Description: Function declarations for bmi_fortran.c.
+  *              
+  */
 #ifndef BMI_FORTRAN_H
 #define BMI_FORTRAN_H
 
@@ -23,10 +35,7 @@ int Get_end_time (Bmi *self, double * time);
 int Get_current_time (Bmi *self, double * time);
 int Finalize (Bmi *self);
 
-// Bmi* register_bmi(Bmi *model);
-
 Bmi* register_bmi_fortran(Bmi *model, void* box_handle);
-
 
 #if defined(__cplusplus)
 }

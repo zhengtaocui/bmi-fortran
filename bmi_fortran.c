@@ -10,6 +10,10 @@
   * Description: These are the wrapper functions and implements the C BMI 
   *              struct to be used by the cfe serialization code.
   *              
+  * Last modified by Zhengtao Cui (Zhengtao.Cui@noaa.gov)
+  * Last date of modification: Mar 10, 2022
+  * Description: Updated Get_var_names function because the Fortran 
+  *             get_var_names function now resturn a copy of the names.
   */
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,18 +54,23 @@ int Get_var_count (Bmi *self, const char *role, int *count)
 
 int Get_var_names (Bmi *self, const char *role, char **names)
 {
-   int count;
-   char **fornames = (char**)NULL;
-   fornames = (char**)malloc( sizeof(char*)); 
-   int bmi_status = get_var_names( self->data, role, fornames );
-   bmi_status = get_var_count( self->data, role, &count );
-   for ( int i = 0; i < count; ++i )
-   {
-      //populate the array of C stings.
-      strncpy(names[i], fornames[0] + i * BMI_MAX_VAR_NAME, BMI_MAX_VAR_NAME ); 
-      names[i] = trim( names[i] );
-   }
-   free(fornames);
+//   int count;
+   int bmi_status = get_var_names( self->data, role, names );
+   /*
+    * get_var_names is changed to copy the content to the
+    * string array of names. The following is not needed.
+    */
+//   char **fornames = (char**)NULL;
+//   fornames = (char**)malloc( sizeof(char*)); 
+//   int bmi_status = get_var_names( self->data, role, fornames );
+//   bmi_status = get_var_count( self->data, role, &count );
+//   for ( int i = 0; i < count; ++i )
+//   {
+//      //populate the array of C stings.
+//      strncpy(names[i], fornames[0] + i * BMI_MAX_VAR_NAME, BMI_MAX_VAR_NAME ); 
+//      names[i] = trim( names[i] );
+//   }
+//   free(fornames);
    return bmi_status;   
 }
 
