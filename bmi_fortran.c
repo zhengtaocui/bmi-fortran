@@ -14,6 +14,9 @@
   * Last date of modification: Mar 10, 2022
   * Description: Updated Get_var_names function because the Fortran 
   *             get_var_names function now resturn a copy of the names.
+  *
+  * Last modified on Mar 18, 2022
+  * Description: renamed the register_bmi_fortran function.
   */
 #include <stdio.h>
 #include <stdlib.h>
@@ -272,7 +275,7 @@ int Finalize (Bmi *self)
    return bmi_status;   
 }
 
-Bmi* register_bmi_fortran(Bmi *model, void* box_handle )
+Bmi* create_bmi_fortran_model_handel(Bmi *model, void* box_handle )
 {
     if (model) {
         model->data = box_handle;
@@ -293,4 +296,3 @@ Bmi* register_bmi_fortran(Bmi *model, void* box_handle )
     }
     return model;
 }
-
