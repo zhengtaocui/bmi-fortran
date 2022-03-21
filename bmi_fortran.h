@@ -38,7 +38,7 @@ int Get_end_time (Bmi *self, double * time);
 int Get_current_time (Bmi *self, double * time);
 int Finalize (Bmi *self);
 
-Bmi* create_bmi_fortran_model_handel(Bmi *model, void* box_handle);
+Bmi* create_bmi_fortran_model_handle(Bmi *model, void* box_handle);
 
 #if defined(__cplusplus)
 }

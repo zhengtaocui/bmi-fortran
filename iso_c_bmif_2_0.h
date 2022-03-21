@@ -3,11 +3,22 @@
 
 #include <stdbool.h>
 
-extern int bmi_factory(void **);
-extern int bmi_destroy(void **);
+/*
+ * These register functions are not implemented in the iso_c_bmif_2_0.f90.
+ * They should be implmented in the concrete type of BMI, such as in the
+ * bmi_sine.f90 file. 
+ */
+extern int get_bmi_handle(void **);
+extern int destroy_bmi_handle(void **);
 
-extern int c_create_box(void **, void **);
-extern int c_delete_box(void **);
+extern int get_box_handle(void **, void **);
+extern int destroy_box_handle(void **);
+
+extern int register_bmi(void **);
+extern int unregister_bmi(void **);
+/*
+ * -------------------------------------------
+ */
 
 extern int initialize(void *, const char*);
 extern int get_component_name(void *, char*);

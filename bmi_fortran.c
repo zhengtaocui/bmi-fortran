@@ -275,7 +275,7 @@ int Finalize (Bmi *self)
    return bmi_status;   
 }
 
-Bmi* create_bmi_fortran_model_handel(Bmi *model, void* box_handle )
+Bmi* create_bmi_fortran_model_handle(Bmi *model, void* box_handle )
 {
     if (model) {
         model->data = box_handle;
