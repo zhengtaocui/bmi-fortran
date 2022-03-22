@@ -739,7 +739,7 @@ module iso_c_bmif_2_0
       !
       ! `src` from C is 1byte, assign it to logical with is 4byte by default
       log4byte = src(:num_items)
-      write(*,*) 'bmi_iso_c:', src(:num_items)
+      !write(*,*) 'bmi_iso_c:', src(:num_items)
       bmi_status = bmi_box%ptr%set_value_logical(f_str, log4byte)
       deallocate(f_str)
       deallocate(log4byte)
