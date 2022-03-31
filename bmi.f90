@@ -12,6 +12,9 @@
 ! Last modification date: Mar 10, 2022
 ! Description: Cleaned up the comments.
 !             
+! Last modification date: Mar 31, 2022
+! Description: Added *_at_indices_* functions for int1, int2, int8, logical and
+!              string data types.
 !
 module bmif_2_0
 
@@ -80,6 +83,16 @@ module bmif_2_0
       
       procedure(bmif_get_value_at_indices_int), deferred :: &
            get_value_at_indices_int
+      procedure(bmif_get_value_at_indices_int1), deferred :: &
+           get_value_at_indices_int1
+      procedure(bmif_get_value_at_indices_int2), deferred :: &
+           get_value_at_indices_int2
+      procedure(bmif_get_value_at_indices_int8), deferred :: &
+           get_value_at_indices_int8
+      procedure(bmif_get_value_at_indices_logical), deferred :: &
+           get_value_at_indices_logical
+      procedure(bmif_get_value_at_indices_string), deferred :: &
+           get_value_at_indices_string
       procedure(bmif_get_value_at_indices_float), deferred :: &
            get_value_at_indices_float
       procedure(bmif_get_value_at_indices_double), deferred :: &
@@ -96,6 +109,16 @@ module bmif_2_0
       procedure(bmif_set_value_logical), deferred :: set_value_logical
       procedure(bmif_set_value_at_indices_int), deferred :: &
            set_value_at_indices_int
+      procedure(bmif_set_value_at_indices_int1), deferred :: &
+           set_value_at_indices_int1
+      procedure(bmif_set_value_at_indices_int2), deferred :: &
+           set_value_at_indices_int2
+      procedure(bmif_set_value_at_indices_int8), deferred :: &
+           set_value_at_indices_int8
+      procedure(bmif_set_value_at_indices_logical), deferred :: &
+           set_value_at_indices_logical
+      procedure(bmif_set_value_at_indices_string), deferred :: &
+           set_value_at_indices_string
       procedure(bmif_set_value_at_indices_float), deferred :: &
            set_value_at_indices_float
       procedure(bmif_set_value_at_indices_double), deferred :: &
@@ -468,6 +491,56 @@ module bmif_2_0
       integer :: bmi_status
     end function bmif_get_value_at_indices_int
 
+    function bmif_get_value_at_indices_int1(this, name, dest, inds) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=1), intent(inout) :: dest(:)
+      integer, intent(in) :: inds(:)
+      integer :: bmi_status
+    end function bmif_get_value_at_indices_int1
+
+    function bmif_get_value_at_indices_int2(this, name, dest, inds) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=2), intent(inout) :: dest(:)
+      integer, intent(in) :: inds(:)
+      integer :: bmi_status
+    end function bmif_get_value_at_indices_int2
+
+    function bmif_get_value_at_indices_int8(this, name, dest, inds) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      integer(kind=8), intent(inout) :: dest(:)
+      integer, intent(in) :: inds(:)
+      integer :: bmi_status
+    end function bmif_get_value_at_indices_int8
+
+    function bmif_get_value_at_indices_logical(this, name, dest, inds) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      logical, intent(inout) :: dest(:)
+      integer, intent(in) :: inds(:)
+      integer :: bmi_status
+    end function bmif_get_value_at_indices_logical
+
+    function bmif_get_value_at_indices_string(this, name, dest, inds) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(in) :: this
+      character(len=*), intent(in) :: name
+      character(len=*), intent(inout) :: dest
+      integer, intent(in) :: inds(:)
+      integer :: bmi_status
+    end function bmif_get_value_at_indices_string
+
     ! Get real values at particular (one-dimensional) indices.
     function bmif_get_value_at_indices_float(this, name, dest, inds) &
       result(bmi_status)
@@ -561,18 +634,73 @@ module bmif_2_0
     function bmif_set_value_at_indices_int(this, name, inds, src) &
       result(bmi_status)
       import :: bmi
-      class(bmi), intent(inout) :: this
+      class(bmi), intent(inout), target :: this
       character(len=*), intent(in) :: name
       integer, intent(in) :: inds(:)
       integer, intent(in) :: src(:)
       integer :: bmi_status
     end function bmif_set_value_at_indices_int
 
+    ! Set integer values at particular (one-dimensional) indices.
+    function bmif_set_value_at_indices_int1(this, name, inds, src) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout), target :: this
+      character(len=*), intent(in) :: name
+      integer, intent(in) :: inds(:)
+      integer(kind=1), intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_at_indices_int1
+
+    ! Set integer values at particular (one-dimensional) indices.
+    function bmif_set_value_at_indices_int2(this, name, inds, src) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout), target :: this
+      character(len=*), intent(in) :: name
+      integer, intent(in) :: inds(:)
+      integer(kind=2), intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_at_indices_int2
+
+    ! Set integer values at particular (one-dimensional) indices.
+    function bmif_set_value_at_indices_int8(this, name, inds, src) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout), target :: this
+      character(len=*), intent(in) :: name
+      integer, intent(in) :: inds(:)
+      integer(kind=8), intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_at_indices_int8
+
+    ! Set logical values at particular (one-dimensional) indices.
+    function bmif_set_value_at_indices_logical(this, name, inds, src) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout), target :: this
+      character(len=*), intent(in) :: name
+      integer, intent(in) :: inds(:)
+      logical, intent(in) :: src(:)
+      integer :: bmi_status
+    end function bmif_set_value_at_indices_logical
+
+    ! Set logical values at particular (one-dimensional) indices.
+    function bmif_set_value_at_indices_string(this, name, inds, src) &
+      result(bmi_status)
+      import :: bmi
+      class(bmi), intent(inout), target :: this
+      character(len=*), intent(in) :: name
+      integer, intent(in) :: inds(:)
+      character(len=*), intent(in) :: src
+      integer :: bmi_status
+    end function bmif_set_value_at_indices_string
+
     ! Set real values at particular (one-dimensional) indices.
     function bmif_set_value_at_indices_float(this, name, inds, src) &
       result(bmi_status)
       import :: bmi
-      class(bmi), intent(inout) :: this
+      class(bmi), intent(inout), target :: this
       character(len=*), intent(in) :: name
       integer, intent(in) :: inds(:)
       real, intent(in) :: src(:)
@@ -583,7 +711,7 @@ module bmif_2_0
     function bmif_set_value_at_indices_double(this, name, inds, src) &
       result(bmi_status)
       import :: bmi
-      class(bmi), intent(inout) :: this
+      class(bmi), intent(inout), target :: this
       character(len=*), intent(in) :: name
       integer, intent(in) :: inds(:)
       double precision, intent(in) :: src(:)
